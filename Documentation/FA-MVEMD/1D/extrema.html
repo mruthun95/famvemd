@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of extrema</title>
+  <meta name="keywords" content="extrema">
+  <meta name="description" content="EXTREMA   Gets the global extrema points from a time series.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">1D</a> &gt; extrema.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\1D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>extrema
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>EXTREMA   Gets the global extrema points from a time series.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [xmax,imax,xmin,imin] = extrema(x) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">EXTREMA   Gets the global extrema points from a time series.
+   [XMAX,IMAX,XMIN,IMIN] = EXTREMA(X) returns the global minima and maxima 
+   points of the vector X ignoring NaN's, where
+    XMAX - maxima points in descending order
+    IMAX - indexes of the XMAX
+    XMIN - minima points in descending order
+    IMIN - indexes of the XMIN
+
+   DEFINITION (from http://en.wikipedia.org/wiki/Maxima_and_minima):
+   In mathematics, maxima and minima, also known as extrema, are points in
+   the domain of a function at which the function takes a largest value
+   (maximum) or smallest value (minimum), either within a given
+   neighbourhood (local extrema) or on the function domain in its entirety
+   (global extrema).
+
+   Example:
+      x = 2*pi*linspace(-1,1);
+      y = cos(x) - 0.5 + 0.5*rand(size(x)); y(40:45) = 1.85; y(50:53)=NaN;
+      [ymax,imax,ymin,imin] = extrema(y);
+      plot(x,y,x(imax),ymax,'g.',x(imin),ymin,'r.')
+
+   See also EXTREMA2, MAX, MIN</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="EMD1D2V.html" class="code" title="function Results = EMD1D2V(u,v,t,param)">EMD1D2V</a>	Purpose:</li><li><a href="EMD1D3V.html" class="code" title="function Results = EMD1D3V(u,v,w,t,param)">EMD1D3V</a>	Purpose:</li><li><a href="EMD1DNV.html" class="code" title="function Results = EMD1DNV(u,t,param)">EMD1DNV</a>	Purpose:</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [xmax,imax,xmin,imin] = extrema(x)</a>
+0002 <span class="comment">%EXTREMA   Gets the global extrema points from a time series.</span>
+0003 <span class="comment">%   [XMAX,IMAX,XMIN,IMIN] = EXTREMA(X) returns the global minima and maxima</span>
+0004 <span class="comment">%   points of the vector X ignoring NaN's, where</span>
+0005 <span class="comment">%    XMAX - maxima points in descending order</span>
+0006 <span class="comment">%    IMAX - indexes of the XMAX</span>
+0007 <span class="comment">%    XMIN - minima points in descending order</span>
+0008 <span class="comment">%    IMIN - indexes of the XMIN</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   DEFINITION (from http://en.wikipedia.org/wiki/Maxima_and_minima):</span>
+0011 <span class="comment">%   In mathematics, maxima and minima, also known as extrema, are points in</span>
+0012 <span class="comment">%   the domain of a function at which the function takes a largest value</span>
+0013 <span class="comment">%   (maximum) or smallest value (minimum), either within a given</span>
+0014 <span class="comment">%   neighbourhood (local extrema) or on the function domain in its entirety</span>
+0015 <span class="comment">%   (global extrema).</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   Example:</span>
+0018 <span class="comment">%      x = 2*pi*linspace(-1,1);</span>
+0019 <span class="comment">%      y = cos(x) - 0.5 + 0.5*rand(size(x)); y(40:45) = 1.85; y(50:53)=NaN;</span>
+0020 <span class="comment">%      [ymax,imax,ymin,imin] = extrema(y);</span>
+0021 <span class="comment">%      plot(x,y,x(imax),ymax,'g.',x(imin),ymin,'r.')</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%   See also EXTREMA2, MAX, MIN</span>
+0024 
+0025 <span class="comment">%   Written by</span>
+0026 <span class="comment">%   Lic. on Physics Carlos Adrián Vargas Aguilera</span>
+0027 <span class="comment">%   Physical Oceanography MS candidate</span>
+0028 <span class="comment">%   UNIVERSIDAD DE GUADALAJARA</span>
+0029 <span class="comment">%   Mexico, 2004</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%   nubeobscura@hotmail.com</span>
+0032 
+0033 <span class="comment">% From       : http://www.mathworks.com/matlabcentral/fileexchange</span>
+0034 <span class="comment">% File ID    : 12275</span>
+0035 <span class="comment">% Submited at: 2006-09-14</span>
+0036 <span class="comment">% 2006-11-11 : English translation from spanish.</span>
+0037 <span class="comment">% 2006-11-17 : Accept NaN's.</span>
+0038 <span class="comment">% 2007-04-09 : Change name to MAXIMA, and definition added.</span>
+0039 
+0040 
+0041 xmax = [];
+0042 imax = [];
+0043 xmin = [];
+0044 imin = [];
+0045 
+0046 <span class="comment">% Vector input?</span>
+0047 Nt = numel(x);
+0048 <span class="keyword">if</span> Nt ~= length(x)
+0049  error(<span class="string">'Entry must be a vector.'</span>)
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="comment">% NaN's:</span>
+0053 inan = find(isnan(x));
+0054 indx = 1:Nt;
+0055 <span class="keyword">if</span> ~isempty(inan)
+0056  indx(inan) = [];
+0057  x(inan) = [];
+0058  Nt = length(x);
+0059 <span class="keyword">end</span>
+0060 
+0061 <span class="comment">% Difference between subsequent elements:</span>
+0062 dx = diff(x);
+0063 
+0064 <span class="comment">% Is an horizontal line?</span>
+0065 <span class="keyword">if</span> ~any(dx)
+0066  <span class="keyword">return</span>
+0067 <span class="keyword">end</span>
+0068 
+0069 <span class="comment">% Flat peaks? Put the middle element:</span>
+0070 a = find(dx~=0);              <span class="comment">% Indexes where x changes</span>
+0071 lm = find(diff(a)~=1) + 1;    <span class="comment">% Indexes where a do not changes</span>
+0072 d = a(lm) - a(lm-1);          <span class="comment">% Number of elements in the flat peak</span>
+0073 a(lm) = a(lm) - floor(d/2);   <span class="comment">% Save middle elements</span>
+0074 a(end+1) = Nt;
+0075 
+0076 <span class="comment">% Peaks?</span>
+0077 xa  = x(a);             <span class="comment">% Serie without flat peaks</span>
+0078 b = (diff(xa) &gt; 0);     <span class="comment">% 1  =&gt;  positive slopes (minima begin)</span>
+0079                         <span class="comment">% 0  =&gt;  negative slopes (maxima begin)</span>
+0080 xb  = diff(b);          <span class="comment">% -1 =&gt;  maxima indexes (but one)</span>
+0081                         <span class="comment">% +1 =&gt;  minima indexes (but one)</span>
+0082 imax = find(xb == -1) + 1; <span class="comment">% maxima indexes</span>
+0083 imin = find(xb == +1) + 1; <span class="comment">% minima indexes</span>
+0084 imax = a(imax);
+0085 imin = a(imin);
+0086 
+0087 nmaxi = length(imax);
+0088 nmini = length(imin);                
+0089 
+0090 <span class="comment">% Maximum or minumim on a flat peak at the ends?</span>
+0091 <span class="keyword">if</span> (nmaxi==0) &amp;&amp; (nmini==0)
+0092  <span class="keyword">if</span> x(1) &gt; x(Nt)
+0093   xmax = x(1);
+0094   imax = indx(1);
+0095   xmin = x(Nt);
+0096   imin = indx(Nt);
+0097  <span class="keyword">elseif</span> x(1) &lt; x(Nt)
+0098   xmax = x(Nt);
+0099   imax = indx(Nt);
+0100   xmin = x(1);
+0101   imin = indx(1);
+0102  <span class="keyword">end</span>
+0103  <span class="keyword">return</span>
+0104 <span class="keyword">end</span>
+0105 
+0106 <span class="comment">% Maximum or minumim at the ends?</span>
+0107 <span class="keyword">if</span> (nmaxi==0) 
+0108  imax(1:2) = [1 Nt];
+0109 <span class="keyword">elseif</span> (nmini==0)
+0110  imin(1:2) = [1 Nt];
+0111 <span class="keyword">else</span>
+0112  <span class="keyword">if</span> imax(1) &lt; imin(1)
+0113   imin(2:nmini+1) = imin;
+0114   imin(1) = 1;
+0115  <span class="keyword">else</span>
+0116   imax(2:nmaxi+1) = imax;
+0117   imax(1) = 1;
+0118  <span class="keyword">end</span>
+0119  <span class="keyword">if</span> imax(end) &gt; imin(end)
+0120   imin(end+1) = Nt;
+0121  <span class="keyword">else</span>
+0122   imax(end+1) = Nt;
+0123  <span class="keyword">end</span>
+0124 <span class="keyword">end</span>
+0125 xmax = x(imax);
+0126 xmin = x(imin);
+0127 
+0128 <span class="comment">% NaN's:</span>
+0129 <span class="keyword">if</span> ~isempty(inan)
+0130  imax = indx(imax);
+0131  imin = indx(imin);
+0132 <span class="keyword">end</span>
+0133 
+0134 <span class="comment">% Same size as x:</span>
+0135 imax = reshape(imax,size(xmax));
+0136 imin = reshape(imin,size(xmin));
+0137 
+0138 <span class="comment">% Descending order:</span>
+0139 [temp,inmax] = sort(-xmax); clear temp
+0140 xmax = xmax(inmax);
+0141 imax = imax(inmax);
+0142 [xmin,inmin] = sort(xmin);
+0143 imin = imin(inmin);
+0144 
+0145 
+0146 <span class="comment">% Carlos Adrián Vargas Aguilera. nubeobscura@hotmail.com</span></pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,22 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  EMD3D2V_parallel -> MinimaMaxima3D;
+  EMD3D2V_parallel -> TIMF_plot;
+  EMD3D3V -> MinimaMaxima3D;
+  EMD3D3V -> TIMF_plot;
+  EMD3D3V -> redblue;
+  EMD3D3V_parallel -> MinimaMaxima3D;
+  EMD3D3V_parallel -> TIMF_plot;
+  EMD3D3V_parallel_var -> MinimaMaxima3D;
+  EMD3D3V_parallel_var -> TIMF_plot;
+  driver_3d_example -> EMD3D3V;
+
+  EMD3D2V_parallel [URL="EMD3D2V_parallel.html"];
+  EMD3D3V [URL="EMD3D3V.html"];
+  EMD3D3V_parallel [URL="EMD3D3V_parallel.html"];
+  EMD3D3V_parallel_var [URL="EMD3D3V_parallel_var.html"];
+  MinimaMaxima3D [URL="MinimaMaxima3D.html"];
+  TIMF_plot [URL="TIMF_plot.html"];
+  driver_3d_example [URL="driver_3d_example.html"];
+  redblue [URL="redblue.html"];
+}

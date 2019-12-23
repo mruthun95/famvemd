@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of driver_3d_example</title>
+  <meta name="keywords" content="driver_3d_example">
+  <meta name="description" content="cleanup">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">3D</a> &gt; driver_3d_example.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\3D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>driver_3d_example
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>cleanup</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">cleanup</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="EMD3D3V.html" class="code" title="function Results = EMD3D3V(u,v,w,param)">EMD3D3V</a>	Purpose:</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%cleanup</span>
+0002 clearvars
+0003 close all
+0004 
+0005 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0006 <span class="comment">%Parameters</span>
+0007 param.n_grid_1    = 30;  <span class="comment">%Grid size in dimension 1</span>
+0008 param.n_grid_2    = 30;  <span class="comment">%Grid size in dimension 2</span>
+0009 param.n_grid_3    = 30;  <span class="comment">%Grid size in dimension 3</span>
+0010 param.nimfs       = 3;    <span class="comment">%Maximum number of IMFs that can be stored</span>
+0011 param.type        = 5;    <span class="comment">%type of window size</span>
+0012 param.tol         = 0.05; <span class="comment">%sifting tolerance</span>
+0013 param.nslice      = 10;   <span class="comment">%number of slices in volume plot</span>
+0014 param.plot        = <span class="string">'on'</span>; <span class="comment">%toggle plotting</span>
+0015 
+0016 <span class="comment">%USE FOR EMD3D3V_parallel_var</span>
+0017 <span class="comment">% param.xend        = 5; %x-domain length in physical units</span>
+0018 <span class="comment">% param.yend        = 5; %y-domain length in physical units</span>
+0019 <span class="comment">% param.zend        = 5; %z-domain length in physical units</span>
+0020 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0021 
+0022 X = linspace(0,30,param.n_grid_1);
+0023 Y = linspace(0,15,param.n_grid_2);
+0024 Z = linspace(0,15,param.n_grid_3);
+0025 
+0026 [x,y,z] = meshgrid(Y,X,Z); 
+0027 
+0028 uc1 = (sin(3.5*x)+sin(3.5*y)+sin(3.5*z));  uc2 = (sin(x)+sin(y)+sin(z)); ru  = (cos(x/24)+cos(y/24)+cos(z/24));
+0029 u   =  uc1 + uc2 + ru; <span class="comment">%Signal 'u'</span>
+0030 
+0031 vc1 = (sin(x)+sin(y)+sin(z));  vc2 = (sin(3.5*x)+sin(3.5*y)+sin(3.5*z)); rv  = (cos(x/24)+cos(y/24)+cos(z/24));
+0032 v   =  vc1 ; <span class="comment">%Signal 'v'</span>
+0033 
+0034 wc1 = (cos(x/24)+cos(y/24)+cos(z/24));  wc2 = (sin(x/5)+sin(y/5)+sin(z/5)); rw = (sin(x)+sin(y)+sin(z)) ;
+0035 w   =  wc1 ;<span class="comment">%+ wc2 + rw; %Signal 'w'</span>
+0036 
+0037 Results = <a href="EMD3D3V.html" class="code" title="function Results = EMD3D3V(u,v,w,param)">EMD3D3V</a>(u,v,w,param);
+0038 
+0039 
+0040</pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

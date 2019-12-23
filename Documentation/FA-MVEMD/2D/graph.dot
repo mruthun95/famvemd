@@ -1,0 +1,12 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  EMD2D2V -> redblue;
+  EMD2D3V -> redblue;
+  driver_2d_example -> EMD2D3V;
+
+  BIMF_subplot [URL="BIMF_subplot.html"];
+  EMD2D2V [URL="EMD2D2V.html"];
+  EMD2D3V [URL="EMD2D3V.html"];
+  driver_2d_example [URL="driver_2d_example.html"];
+  redblue [URL="redblue.html"];
+}

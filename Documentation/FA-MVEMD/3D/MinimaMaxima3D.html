@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of MinimaMaxima3D</title>
+  <meta name="keywords" content="MinimaMaxima3D">
+  <meta name="description" content="V 1.0 Dec 13, 07">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">3D</a> &gt; MinimaMaxima3D.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\3D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>MinimaMaxima3D
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>V 1.0 Dec 13, 07</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,Robust,LookInBoundaries,numbermax,numbermin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> V 1.0 Dec 13, 07
+ Author Sam Pichardo.
+ This  function finds the local minima and maxima in a 3D Cartesian data. 
+ It's assumed that the data is uniformly distributed.
+ The minima and maxima are calculated using a multi-directional derivation. 
+
+ Use:
+  
+  [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,[Robust],[LookInBoundaries],[numbermax],[numbermin])
+  
+ where Input is the 3D data and Robust (optional and with a default value
+ of 1) indicates if the multi-directional derivation should include the
+ diagonal derivations. 
+
+ Input has to have a size larger or equal than [3 x 3 x 3]
+  
+ If Robust=1, the total number of derivations taken into account are 26: 6
+ for all surrounding elements colliding each of the faces of the unit cube; 
+ 10 for all the surrounding elements in diagonal.
+  
+ If Robust =0, then only the 6 elements of the colliding faces are considered
+  
+ The function returns in Maxima and MaxPos, respectively, 
+ the values (numbermax) and subindexes (numbermax x 3) of local maxima
+ and position in Input. Maxima (and the subindexes) are sorted in
+ descending order.
+ Similar situation for Minima and MinimaPos witn a numbermin elements but 
+ with the execption of being sorted in ascending order.
+  
+ IMPORTANT: if numbermin or numbermax are not specified, ALL the minima
+ or maxima will be returned. This can be a useless for highly
+ oscillating data
+  
+ LookInBoundaries (default value of 0) specifies if a search of the minima/maxima should be
+ done in the boundaries of the matrix. This situation depends on the
+ the desire application. When it is not activated, the algorithm WILL NOT
+ FIND ANY MINIMA/MAXIMA on the 6 layers of the boundaries.
+ When it is activated, the finding minima and maxima on the boundaries is done by
+ replicating the extra layer as the layer 2 (or layer N-1, depending of the boundary)
+ By example (and using a 2D matrix for simplicity reasons):
+ For the matrix 
+ [ 4 1 3 7
+   5 7 8 8
+   9 9 9 9
+   5 6 7 9]
+  
+ the calculation of the partial derivate following the -x direction will be done by substrascting
+ [ 5 7 8 8
+   4 1 3 7
+   5 7 8 8
+   9 9 9 9]
+ to the input. And so on for the other dimensions.
+ Like this, the value &quot;1&quot; at the coordinate (1,2) will be detected as a
+ minima. Same situation for the value &quot;5&quot; at the coordinate (4,1)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="EMD3D2V_parallel.html" class="code" title="function Results = EMD3D2V_parallel(u,v,param)">EMD3D2V_parallel</a>	Purpose:</li><li><a href="EMD3D3V.html" class="code" title="function Results = EMD3D3V(u,v,w,param)">EMD3D3V</a>	Purpose:</li><li><a href="EMD3D3V_parallel.html" class="code" title="function Results = EMD3D3V_parallel(u,v,w,param)">EMD3D3V_parallel</a>	Purpose:</li><li><a href="EMD3D3V_parallel_var.html" class="code" title="function Results = EMD3D3V_parallel_var(u,v,w,param)">EMD3D3V_parallel_var</a>	Purpose:</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,Robust,LookInBoundaries,numbermax,numbermin)</a>
+0002 <span class="comment">% V 1.0 Dec 13, 07</span>
+0003 <span class="comment">% Author Sam Pichardo.</span>
+0004 <span class="comment">% This  function finds the local minima and maxima in a 3D Cartesian data.</span>
+0005 <span class="comment">% It's assumed that the data is uniformly distributed.</span>
+0006 <span class="comment">% The minima and maxima are calculated using a multi-directional derivation.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Use:</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,[Robust],[LookInBoundaries],[numbermax],[numbermin])</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% where Input is the 3D data and Robust (optional and with a default value</span>
+0013 <span class="comment">% of 1) indicates if the multi-directional derivation should include the</span>
+0014 <span class="comment">% diagonal derivations.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Input has to have a size larger or equal than [3 x 3 x 3]</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% If Robust=1, the total number of derivations taken into account are 26: 6</span>
+0019 <span class="comment">% for all surrounding elements colliding each of the faces of the unit cube;</span>
+0020 <span class="comment">% 10 for all the surrounding elements in diagonal.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% If Robust =0, then only the 6 elements of the colliding faces are considered</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% The function returns in Maxima and MaxPos, respectively,</span>
+0025 <span class="comment">% the values (numbermax) and subindexes (numbermax x 3) of local maxima</span>
+0026 <span class="comment">% and position in Input. Maxima (and the subindexes) are sorted in</span>
+0027 <span class="comment">% descending order.</span>
+0028 <span class="comment">% Similar situation for Minima and MinimaPos witn a numbermin elements but</span>
+0029 <span class="comment">% with the execption of being sorted in ascending order.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% IMPORTANT: if numbermin or numbermax are not specified, ALL the minima</span>
+0032 <span class="comment">% or maxima will be returned. This can be a useless for highly</span>
+0033 <span class="comment">% oscillating data</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% LookInBoundaries (default value of 0) specifies if a search of the minima/maxima should be</span>
+0036 <span class="comment">% done in the boundaries of the matrix. This situation depends on the</span>
+0037 <span class="comment">% the desire application. When it is not activated, the algorithm WILL NOT</span>
+0038 <span class="comment">% FIND ANY MINIMA/MAXIMA on the 6 layers of the boundaries.</span>
+0039 <span class="comment">% When it is activated, the finding minima and maxima on the boundaries is done by</span>
+0040 <span class="comment">% replicating the extra layer as the layer 2 (or layer N-1, depending of the boundary)</span>
+0041 <span class="comment">% By example (and using a 2D matrix for simplicity reasons):</span>
+0042 <span class="comment">% For the matrix</span>
+0043 <span class="comment">% [ 4 1 3 7</span>
+0044 <span class="comment">%   5 7 8 8</span>
+0045 <span class="comment">%   9 9 9 9</span>
+0046 <span class="comment">%   5 6 7 9]</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% the calculation of the partial derivate following the -x direction will be done by substrascting</span>
+0049 <span class="comment">% [ 5 7 8 8</span>
+0050 <span class="comment">%   4 1 3 7</span>
+0051 <span class="comment">%   5 7 8 8</span>
+0052 <span class="comment">%   9 9 9 9]</span>
+0053 <span class="comment">% to the input. And so on for the other dimensions.</span>
+0054 <span class="comment">% Like this, the value &quot;1&quot; at the coordinate (1,2) will be detected as a</span>
+0055 <span class="comment">% minima. Same situation for the value &quot;5&quot; at the coordinate (4,1)</span>
+0056 
+0057 
+0058 <span class="keyword">if</span> nargin &lt;1
+0059     test=load(<span class="string">'temp.mat'</span>);
+0060     pf=test.uresTot(test.EvalLims(2,1):test.EvalLims(2,2));
+0061     pf=reshape(pf,length(test.EvalCoord{2}.Ry),length(test.EvalCoord{2}.Rx),length(test.EvalCoord{2}.Rz));
+0062     Input = abs(pf)*1.5e6;
+0063     clear test;
+0064     clear pf;
+0065     Robust =1;
+0066 <span class="keyword">end</span>
+0067 
+0068 Asize=size(Input);
+0069 
+0070 <span class="keyword">if</span> length(Asize)&lt;3
+0071     error(<span class="string">'MinimaMaxima3D can only works with 3D matrices '</span>);
+0072 <span class="keyword">end</span>
+0073    
+0074 
+0075 <span class="keyword">if</span> (Asize(1)&lt;3 || Asize(2)&lt;3 || Asize(3)&lt;3)
+0076     error(<span class="string">'MinimaMaxima3D can only works with matrices with dimensions equal or larger to [3x3x3]'</span>);
+0077 <span class="keyword">end</span>
+0078 
+0079 <span class="keyword">if</span> ~isreal(Input)
+0080     warning(<span class="string">'ATTENTION, complex values detected!!, using abs(Input)'</span>);
+0081     Input=abs(Input);
+0082 <span class="keyword">end</span>
+0083 
+0084 <span class="keyword">if</span> ~exist(<span class="string">'Robust'</span>,<span class="string">'var'</span>)
+0085     Robust=1;
+0086 <span class="keyword">end</span>
+0087 
+0088 <span class="keyword">if</span> ~exist(<span class="string">'LookInBoundaries'</span>,<span class="string">'var'</span>)
+0089     LookInBoundaries=0;
+0090 <span class="keyword">end</span>
+0091 
+0092 <span class="keyword">if</span> ~exist(<span class="string">'numbermax'</span>,<span class="string">'var'</span>)
+0093     numbermax=0;
+0094 <span class="keyword">end</span>
+0095 
+0096 <span class="keyword">if</span> ~exist(<span class="string">'numbermin'</span>,<span class="string">'var'</span>)
+0097     numbermin=0;
+0098 <span class="keyword">end</span>
+0099 
+0100 [xx_base,yy_base,zz_base]=ndgrid(1:Asize(1),1:Asize(2),1:Asize(3));
+0101 
+0102 
+0103 IndBase=sub2ind(Asize,xx_base(:),yy_base(:),zz_base(:));
+0104 
+0105 <span class="keyword">if</span> Robust ~= 0
+0106     Numbder_dd=26;
+0107 <span class="keyword">else</span>
+0108     Numbder_dd=6;
+0109 <span class="keyword">end</span>
+0110 
+0111 <span class="keyword">if</span> LookInBoundaries==0
+0112     lx=1:Asize(1);
+0113     lx_p1=[2:Asize(1),Asize(1)];
+0114     lx_m1=[1,1:Asize(1)-1];
+0115     ly=1:Asize(2);
+0116     ly_p1=[2:Asize(2),Asize(2)];
+0117     ly_m1=[1,1:Asize(2)-1];
+0118     lz=1:Asize(3);
+0119     lz_p1=[2:Asize(3),Asize(3)];
+0120     lz_m1=[1,1:Asize(3)-1];
+0121 <span class="keyword">else</span>
+0122     lx=1:Asize(1);
+0123     lx_p1=[2:Asize(1),Asize(1)-1]; <span class="comment">%We replicate the layer N-1 as the layer N+1</span>
+0124     lx_m1=[2,1:Asize(1)-1]; <span class="comment">%We replicate the layer 2 as the layer -1</span>
+0125     ly=1:Asize(2);
+0126     ly_p1=[2:Asize(2),Asize(2)-1]; <span class="comment">%We replicate the layer N-1 as the layer N+1</span>
+0127     ly_m1=[2,1:Asize(2)-1]; <span class="comment">%We replicate the layer 2 as the layer -1</span>
+0128     lz=1:Asize(3);
+0129     lz_p1=[2:Asize(3),Asize(3)-1]; <span class="comment">%We replicate the layer N-1 as the layer N+1</span>
+0130     lz_m1=[2,1:Asize(3)-1];<span class="comment">%We replicate the layer 2 as the layer -1</span>
+0131 <span class="keyword">end</span>
+0132 
+0133 <span class="keyword">for</span> n_dd=1:Numbder_dd
+0134     <span class="keyword">switch</span> n_dd
+0135         <span class="keyword">case</span> 1
+0136             <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1)</span>
+0137             [xx,yy,zz]=ndgrid(lx_p1,ly,lz);
+0138 
+0139         <span class="keyword">case</span> 2
+0140             <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1)</span>
+0141             [xx,yy,zz]=ndgrid(lx_m1,ly,lz);
+0142 
+0143         <span class="keyword">case</span> 3
+0144             <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(y)-elem(y+1)</span>
+0145             [xx,yy,zz]=ndgrid(lx,ly_p1,lz);
+0146 
+0147         <span class="keyword">case</span> 4
+0148             <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(y)-elem(y-1)</span>
+0149             [xx,yy,zz]=ndgrid(lx,ly_m1,lz);
+0150 
+0151         <span class="keyword">case</span> 5
+0152             <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(z)-elem(z+1)</span>
+0153             [xx,yy,zz]=ndgrid(lx,ly,lz_p1);
+0154 
+0155          <span class="keyword">case</span> 6
+0156             <span class="comment">%%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(z)-elem(z-1)</span>
+0157             [xx,yy,zz]=ndgrid(lx,ly,lz_m1);
+0158         <span class="keyword">case</span> 7
+0159            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y+1)</span>
+0160             [xx,yy,zz]=ndgrid(lx_p1,ly_p1,lz);
+0161         <span class="keyword">case</span> 8
+0162            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y-1)</span>
+0163             [xx,yy,zz]=ndgrid(lx_p1,ly_m1,lz);
+0164         <span class="keyword">case</span> 9
+0165            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y-1)</span>
+0166             [xx,yy,zz]=ndgrid(lx_m1,ly_m1,lz);
+0167         <span class="keyword">case</span> 10
+0168            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y+1)</span>
+0169             [xx,yy,zz]=ndgrid(lx_m1,ly_p1,lz);
+0170         <span class="keyword">case</span> 11
+0171            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,z+1)</span>
+0172             [xx,yy,zz]=ndgrid(lx_p1,ly,lz_p1);
+0173         <span class="keyword">case</span> 12
+0174            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,z-1)</span>
+0175             [xx,yy,zz]=ndgrid(lx_p1,ly,lz_m1);
+0176         <span class="keyword">case</span> 13
+0177            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,z-1)</span>
+0178             [xx,yy,zz]=ndgrid(lx_m1,ly,lz_m1);
+0179         <span class="keyword">case</span> 14
+0180            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,z+1)</span>
+0181             [xx,yy,zz]=ndgrid(lx_m1,ly,lz_p1);
+0182         <span class="keyword">case</span> 15
+0183            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(y+1,z+1)</span>
+0184             [xx,yy,zz]=ndgrid(lx,ly_p1,lz_p1);
+0185         <span class="keyword">case</span> 16
+0186            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(y+1,z-1)</span>
+0187             [xx,yy,zz]=ndgrid(lx,ly_p1,lz_m1);
+0188         <span class="keyword">case</span> 17
+0189            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(y-1,z-1)</span>
+0190             [xx,yy,zz]=ndgrid(lx,ly_m1,lz_m1);
+0191         <span class="keyword">case</span> 18
+0192            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(y-1,z+1)</span>
+0193             [xx,yy,zz]=ndgrid(lx,ly_m1,lz_p1);
+0194          <span class="keyword">case</span> 19
+0195            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y+1,z+1)</span>
+0196             [xx,yy,zz]=ndgrid(lx_p1,ly_p1,lz_p1);
+0197          <span class="keyword">case</span> 20
+0198            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y+1,z-1)</span>
+0199             [xx,yy,zz]=ndgrid(lx_p1,ly_p1,lz_m1);
+0200          <span class="keyword">case</span> 21
+0201            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y-1,z+1)</span>
+0202             [xx,yy,zz]=ndgrid(lx_p1,ly_m1,lz_p1);
+0203          <span class="keyword">case</span> 22
+0204            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x+1,y-1,z-1)</span>
+0205             [xx,yy,zz]=ndgrid(lx_p1,ly_m1,lz_m1);
+0206          <span class="keyword">case</span> 23
+0207            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y+1,z+1)</span>
+0208             [xx,yy,zz]=ndgrid(lx_m1,ly_p1,lz_p1);
+0209          <span class="keyword">case</span> 24
+0210            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y+1,z-1)</span>
+0211             [xx,yy,zz]=ndgrid(lx_m1,ly_p1,lz_m1);
+0212          <span class="keyword">case</span> 25
+0213            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y-1,z+1)</span>
+0214             [xx,yy,zz]=ndgrid(lx_m1,ly_m1,lz_p1);
+0215          <span class="keyword">case</span> 26
+0216            <span class="comment">%%%%%%%%%%%%%%%%%% %% This index is used to calculated elem(x)-elem(x-1,y-1,z-1)</span>
+0217             [xx,yy,zz]=ndgrid(lx_m1,ly_m1,lz_m1);   
+0218 
+0219     <span class="keyword">end</span>
+0220 
+0221     Ind_dd=sub2ind(Asize,xx(:),yy(:),zz(:)); 
+0222     
+0223     part_deriv = Input(IndBase)-Input(Ind_dd);
+0224     
+0225     <span class="keyword">if</span> n_dd &gt;1
+0226         MatMinMax= (sign_Prev_deriv==sign(part_deriv)).*MatMinMax;
+0227     <span class="keyword">else</span>
+0228         MatMinMax=sign(part_deriv);
+0229     <span class="keyword">end</span>
+0230 
+0231     sign_Prev_deriv=sign(part_deriv);
+0232 <span class="keyword">end</span>
+0233 
+0234 <span class="comment">%Well , now the easy part, all values MatMinMax ==1 are local maximum and</span>
+0235 <span class="comment">%the values MatMinMax ==-1 are minimun</span>
+0236 
+0237 AllMaxima=find(MatMinMax==1);
+0238 AllMinima=find(MatMinMax==-1);
+0239 
+0240 <span class="keyword">if</span> numbermax ==0
+0241     nmax=length(AllMaxima);
+0242 <span class="keyword">else</span>
+0243     nmax=numbermax;
+0244 <span class="keyword">end</span>
+0245 nmax=min([nmax,length(AllMaxima)]);
+0246 smax=1:nmax;
+0247 
+0248 <span class="keyword">if</span> numbermin ==0
+0249     nmin=length(AllMinima);
+0250 <span class="keyword">else</span>
+0251     nmin=numbermin;
+0252 <span class="keyword">end</span>
+0253 
+0254 nmin=min([nmin,length(AllMinima)]);
+0255 
+0256 smin=1:nmin;
+0257 
+0258 [Maxima,IndMax]=sort(Input(AllMaxima),<span class="string">'descend'</span>);
+0259 Maxima=Maxima(smax);
+0260 IndMax=AllMaxima(IndMax(smax));
+0261 
+0262 MaxPos=zeros(nmax,3);
+0263 [MaxPos(:,1),MaxPos(:,2),MaxPos(:,3)]=ind2sub(Asize,IndMax);
+0264 
+0265 [Minima,IndMin]=sort(Input(AllMinima));
+0266 Minima=Minima(smin);
+0267 IndMin=AllMinima(IndMin(smin));
+0268 
+0269 MinPos=zeros(nmin,3);
+0270 [MinPos(:,1),MinPos(:,2),MinPos(:,3)]=ind2sub(Asize,IndMin);
+0271</pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

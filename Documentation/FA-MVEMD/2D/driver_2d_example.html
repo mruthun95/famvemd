@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of driver_2d_example</title>
+  <meta name="keywords" content="driver_2d_example">
+  <meta name="description" content="cleanup">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">2D</a> &gt; driver_2d_example.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\2D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>driver_2d_example
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>cleanup</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">cleanup</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="EMD2D3V.html" class="code" title="function Results = EMD2D3V(u,v,w,param)">EMD2D3V</a>	Purpose:</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%cleanup</span>
+0002 clearvars
+0003 close all
+0004 
+0005 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0006 <span class="comment">%Parameters</span>
+0007 param.n_grid_1    = 256;  <span class="comment">%Grid size in dimension 1</span>
+0008 param.n_grid_2    = 256;  <span class="comment">%Grid size in dimension 2</span>
+0009 param.nimfs       = 3;    <span class="comment">%Maximum number of IMFs that can be stored</span>
+0010 param.type        = 6;    <span class="comment">%type of window size</span>
+0011 param.tol         = 0.01; <span class="comment">%sifting tolerance</span>
+0012 param.plot        = <span class="string">'on'</span>; <span class="comment">%toggle plotting</span>
+0013 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0014 
+0015 X = linspace(0,30,param.n_grid_1);
+0016 Y = linspace(0,30,param.n_grid_2);
+0017 
+0018 [x,y] = meshgrid(Y,X); 
+0019 
+0020 uc1 = (sin(4*x)+sin(4*y));  uc2 = (sin(x)+sin(y)); ru  = (cos(x/24)+cos(y/24));
+0021 u   =  uc1 + uc2 + ru; <span class="comment">%Signal 'u'</span>
+0022 
+0023 vc1 = (sin(x)+sin(y));  vc2 = (sin(3.5*x)+sin(3.5*y)); rv  = (cos(x/24)+cos(y/24));
+0024 v   =  vc1 ; <span class="comment">%Signal 'v'</span>
+0025 
+0026 wc1 = (cos(x/24)+cos(y/24));  wc2 = (sin(x/5)+sin(y/5)); rw = (sin(x)+sin(y)) ;
+0027 w   =  wc2 ;<span class="comment">%+ wc2 + rw; %Signal 'w'</span>
+0028 
+0029 Results = <a href="EMD2D3V.html" class="code" title="function Results = EMD2D3V(u,v,w,param)">EMD2D3V</a>(u,v,w,param);
+0030 
+0031 
+0032</pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

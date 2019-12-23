@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of TIMF_plot</title>
+  <meta name="keywords" content="TIMF_plot">
+  <meta name="description" content="default plot attributes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">3D</a> &gt; TIMF_plot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\3D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>TIMF_plot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>default plot attributes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function TIMF_plot(signal,Colour,nslice,imf,name1,name2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> default plot attributes</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="EMD3D2V_parallel.html" class="code" title="function Results = EMD3D2V_parallel(u,v,param)">EMD3D2V_parallel</a>	Purpose:</li><li><a href="EMD3D3V.html" class="code" title="function Results = EMD3D3V(u,v,w,param)">EMD3D3V</a>	Purpose:</li><li><a href="EMD3D3V_parallel.html" class="code" title="function Results = EMD3D3V_parallel(u,v,w,param)">EMD3D3V_parallel</a>	Purpose:</li><li><a href="EMD3D3V_parallel_var.html" class="code" title="function Results = EMD3D3V_parallel_var(u,v,w,param)">EMD3D3V_parallel_var</a>	Purpose:</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function TIMF_plot(signal,Colour,nslice,imf,name1,name2)</a>
+0002 
+0003 <span class="comment">% default plot attributes</span>
+0004 set(groot,<span class="string">'defaultaxesfontname'</span>,<span class="string">'times'</span>);
+0005 set(groot,<span class="string">'defaultaxesfontsize'</span>,12);
+0006 set(groot,<span class="string">'defaulttextInterpreter'</span>,<span class="string">'latex'</span>);
+0007 set(groot,<span class="string">'defaultLineLineWidth'</span>,2);
+0008 
+0009 [Nx, Ny, Nz] = size(signal);
+0010 
+0011 figure
+0012     xslice = linspace(1,Nx,nslice);
+0013     yslice = linspace(1,Ny,nslice);
+0014     zslice = linspace(1,Nz,nslice);
+0015     volume = slice(signal,xslice,yslice,zslice);
+0016     axis equal;
+0017     xlabel(<span class="string">'x'</span>);
+0018     ylabel(<span class="string">'y'</span>);
+0019     zlabel(<span class="string">'z'</span>);
+0020     <span class="keyword">switch</span>(name1)
+0021         <span class="keyword">case</span> <span class="string">'IMF'</span>
+0022             title(sprintf(<span class="string">'%s %d %s'</span>,name1,imf,name2));
+0023         <span class="keyword">case</span> <span class="string">'Signal'</span>
+0024             title(sprintf(<span class="string">'%s %s'</span>,name1,name2));
+0025         <span class="keyword">case</span> <span class="string">'Residue'</span>
+0026             title(sprintf(<span class="string">'%s %s'</span>,name1,name2));
+0027     <span class="keyword">end</span>
+0028     colorbar;
+0029 <span class="comment">%     caxis([c(1) c(2)]);</span>
+0030     set(volume,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="keyword">...</span>
+0031         <span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="keyword">...</span>
+0032         <span class="string">'FaceAlpha'</span>,<span class="string">'interp'</span>)
+0033     alpha(<span class="string">'color'</span>)
+0034     view(30,30);
+0035     alphamap(<span class="string">'rampup'</span>)
+0036     alphamap(<span class="string">'decrease'</span>,.1)
+0037     colormap(Colour);</pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

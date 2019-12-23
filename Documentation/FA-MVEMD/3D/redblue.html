@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of redblue</title>
+  <meta name="keywords" content="redblue">
+  <meta name="description" content="REDBLUE    Shades of red and blue color map">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">3D</a> &gt; redblue.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\3D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>redblue
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>REDBLUE    Shades of red and blue color map</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function c = redblue(m) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">REDBLUE    Shades of red and blue color map
+   REDBLUE(M), is an M-by-3 matrix that defines a colormap.
+   The colors begin with bright blue, range through shades of
+   blue to white, and then through shades of red to bright red.
+   REDBLUE, by itself, is the same length as the current figure's
+   colormap. If no figure exists, MATLAB creates one.
+
+   For example, to reset the colormap of the current figure:
+
+             colormap(redblue)
+
+   See also HSV, GRAY, HOT, BONE, COPPER, PINK, FLAG,
+   COLORMAP, RGBPLOT.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FA-MVEMD/2D/EMD2D2V.html" class="code" title="function Results = EMD2D2V(u,v,param,varargin)">EMD2D2V</a>	Purpose:</li><li><a href="../../FA-MVEMD/2D/EMD2D3V.html" class="code" title="function Results = EMD2D3V(u,v,w,param)">EMD2D3V</a>	Purpose:</li><li><a href="EMD3D3V.html" class="code" title="function Results = EMD3D3V(u,v,w,param)">EMD3D3V</a>	Purpose:</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function c = redblue(m)</a>
+0002 <span class="comment">%REDBLUE    Shades of red and blue color map</span>
+0003 <span class="comment">%   REDBLUE(M), is an M-by-3 matrix that defines a colormap.</span>
+0004 <span class="comment">%   The colors begin with bright blue, range through shades of</span>
+0005 <span class="comment">%   blue to white, and then through shades of red to bright red.</span>
+0006 <span class="comment">%   REDBLUE, by itself, is the same length as the current figure's</span>
+0007 <span class="comment">%   colormap. If no figure exists, MATLAB creates one.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%   For example, to reset the colormap of the current figure:</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%             colormap(redblue)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   See also HSV, GRAY, HOT, BONE, COPPER, PINK, FLAG,</span>
+0014 <span class="comment">%   COLORMAP, RGBPLOT.</span>
+0015 
+0016 <span class="comment">%   Adam Auton, 9th October 2009</span>
+0017 
+0018 <span class="keyword">if</span> nargin &lt; 1, m = size(get(gcf,<span class="string">'colormap'</span>),1); <span class="keyword">end</span>
+0019 
+0020 <span class="keyword">if</span> (mod(m,2) == 0)
+0021     <span class="comment">% From [0 0 1] to [1 1 1], then [1 1 1] to [1 0 0];</span>
+0022     m1 = m*0.5;
+0023     r = (0:m1-1)'/max(m1-1,1);
+0024     g = r;
+0025     r = [r; ones(m1,1)];
+0026     g = [g; flipud(g)];
+0027     b = flipud(r);
+0028 <span class="keyword">else</span>
+0029     <span class="comment">% From [0 0 1] to [1 1 1] to [1 0 0];</span>
+0030     m1 = floor(m*0.5);
+0031     r = (0:m1-1)'/max(m1,1);
+0032     g = r;
+0033     r = [r; ones(m1+1,1)];
+0034     g = [g; 1; flipud(g)];
+0035     b = flipud(r);
+0036 <span class="keyword">end</span>
+0037 
+0038 c = [r g b]; 
+0039</pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

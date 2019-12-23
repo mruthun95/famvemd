@@ -1,0 +1,48 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  EMD1D2V -> extrema;
+  EMD1D2V -> filter_size1D;
+  EMD1D3V -> extrema;
+  EMD1D3V -> filter_size1D;
+  EMD1DNV -> extrema;
+  EMD1DNV -> filter_size1D;
+  driver_1d_example -> EMD1D3V;
+  driver_1dnv_example -> EMD1DNV;
+  EMD2D2V -> redblue;
+  EMD2D2V -> redblue;
+  EMD2D3V -> redblue;
+  EMD2D3V -> redblue;
+  driver_2d_example -> EMD2D3V;
+  EMD3D2V_parallel -> MinimaMaxima3D;
+  EMD3D2V_parallel -> TIMF_plot;
+  EMD3D3V -> redblue;
+  EMD3D3V -> MinimaMaxima3D;
+  EMD3D3V -> TIMF_plot;
+  EMD3D3V -> redblue;
+  EMD3D3V_parallel -> MinimaMaxima3D;
+  EMD3D3V_parallel -> TIMF_plot;
+  EMD3D3V_parallel_var -> MinimaMaxima3D;
+  EMD3D3V_parallel_var -> TIMF_plot;
+  driver_3d_example -> EMD3D3V;
+
+  EMD1D2V [URL="FA-MVEMD/1D/EMD1D2V.html"];
+  EMD1D3V [URL="FA-MVEMD/1D/EMD1D3V.html"];
+  EMD1DNV [URL="FA-MVEMD/1D/EMD1DNV.html"];
+  driver_1d_example [URL="FA-MVEMD/1D/driver_1d_example.html"];
+  driver_1dnv_example [URL="FA-MVEMD/1D/driver_1dnv_example.html"];
+  extrema [URL="FA-MVEMD/1D/extrema.html"];
+  filter_size1D [URL="FA-MVEMD/1D/filter_size1D.html"];
+  BIMF_subplot [URL="FA-MVEMD/2D/BIMF_subplot.html"];
+  EMD2D2V [URL="FA-MVEMD/2D/EMD2D2V.html"];
+  EMD2D3V [URL="FA-MVEMD/2D/EMD2D3V.html"];
+  driver_2d_example [URL="FA-MVEMD/2D/driver_2d_example.html"];
+  redblue [URL="FA-MVEMD/2D/redblue.html"];
+  EMD3D2V_parallel [URL="FA-MVEMD/3D/EMD3D2V_parallel.html"];
+  EMD3D3V [URL="FA-MVEMD/3D/EMD3D3V.html"];
+  EMD3D3V_parallel [URL="FA-MVEMD/3D/EMD3D3V_parallel.html"];
+  EMD3D3V_parallel_var [URL="FA-MVEMD/3D/EMD3D3V_parallel_var.html"];
+  MinimaMaxima3D [URL="FA-MVEMD/3D/MinimaMaxima3D.html"];
+  TIMF_plot [URL="FA-MVEMD/3D/TIMF_plot.html"];
+  driver_3d_example [URL="FA-MVEMD/3D/driver_3d_example.html"];
+  redblue [URL="FA-MVEMD/3D/redblue.html"];
+}

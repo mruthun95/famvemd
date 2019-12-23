@@ -1,0 +1,630 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of EMD3D3V</title>
+  <meta name="keywords" content="EMD3D3V">
+  <meta name="description" content="Purpose:">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">FA-MVEMD</a> &gt; <a href="index.html">3D</a> &gt; EMD3D3V.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for FA-MVEMD\3D&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>EMD3D3V
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Purpose:</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function Results = EMD3D3V(u,v,w,param) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Purpose: 
+ -To perform EMD on 3 channels of 3 dimensional data
+
+ Input: 
+ - u: Signal 1
+ - v: Signal 2
+ - w: Signal 3
+ - param.
+   -nimfs: Number of IMFs to be extracted 
+   -tol: Sifting tolerance value
+   -type: type of window size to be used
+   -plot: 'on' to plot results, default hides IMF plots
+   -nslice: number of slices in volume plot
+
+ Output:
+ - Results
+   - IMF (structure containing IMFs of all three signals)
+   - Residue (structure containing residue of all three signals)
+   - Windows (Window sizes (5 types) for each IMF)
+   - Sift_cnt (Number of sifting iterations for each signal)
+   - IO (Index of orthogonality for each signal)
+   - Error (Error of the decomposition for each signal)
+
+ References:
+
+ 
+ Written by Mruthun Thirumalaisamy
+ Graduate Student
+ Department of Aerospace Engineering
+ University of Illinois at Urbana-Champaign
+ May 16 2018
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../FA-MVEMD/2D/redblue.html" class="code" title="function c = redblue(m)">redblue</a>	REDBLUE    Shades of red and blue color map</li><li><a href="MinimaMaxima3D.html" class="code" title="function [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,Robust,LookInBoundaries,numbermax,numbermin)">MinimaMaxima3D</a>	V 1.0 Dec 13, 07</li><li><a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>	default plot attributes</li><li><a href="redblue.html" class="code" title="function c = redblue(m)">redblue</a>	REDBLUE    Shades of red and blue color map</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="driver_3d_example.html" class="code" title="">driver_3d_example</a>	cleanup</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function Windows = filter_size(maxima_pos, minima_pos,type)</a></li><li><a href="#_sub2" class="code">function Env = OSF(H,w_sz)</a></li><li><a href="#_sub3" class="code">function Signal = Separable_ordfilt3(Signal, order, w_sz)</a></li><li><a href="#_sub4" class="code">function f_signal = Ordfilt1(signal,order,window_size)</a></li><li><a href="#_sub5" class="code">function Env = Pad_smooth(Env,w_sz)</a></li><li><a href="#_sub6" class="code">function [IO,Error] = Orth_index(Signal,IMF,Residue)</a></li><li><a href="#_sub7" class="code">function Plot_results(u,v,w,Results,param)</a></li><li><a href="#_sub8" class="code">function TIMF_plot(signal,Colour,nslice,imf,name1,name2)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Purpose:</span>
+0002 <span class="comment">% -To perform EMD on 3 channels of 3 dimensional data</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Input:</span>
+0005 <span class="comment">% - u: Signal 1</span>
+0006 <span class="comment">% - v: Signal 2</span>
+0007 <span class="comment">% - w: Signal 3</span>
+0008 <span class="comment">% - param.</span>
+0009 <span class="comment">%   -nimfs: Number of IMFs to be extracted</span>
+0010 <span class="comment">%   -tol: Sifting tolerance value</span>
+0011 <span class="comment">%   -type: type of window size to be used</span>
+0012 <span class="comment">%   -plot: 'on' to plot results, default hides IMF plots</span>
+0013 <span class="comment">%   -nslice: number of slices in volume plot</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Output:</span>
+0016 <span class="comment">% - Results</span>
+0017 <span class="comment">%   - IMF (structure containing IMFs of all three signals)</span>
+0018 <span class="comment">%   - Residue (structure containing residue of all three signals)</span>
+0019 <span class="comment">%   - Windows (Window sizes (5 types) for each IMF)</span>
+0020 <span class="comment">%   - Sift_cnt (Number of sifting iterations for each signal)</span>
+0021 <span class="comment">%   - IO (Index of orthogonality for each signal)</span>
+0022 <span class="comment">%   - Error (Error of the decomposition for each signal)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% References:</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Written by Mruthun Thirumalaisamy</span>
+0028 <span class="comment">% Graduate Student</span>
+0029 <span class="comment">% Department of Aerospace Engineering</span>
+0030 <span class="comment">% University of Illinois at Urbana-Champaign</span>
+0031 <span class="comment">% May 16 2018</span>
+0032 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0033 
+0034 <a name="_sub0" href="#_subfunctions" class="code">function Results = EMD3D3V(u,v,w,param) </a>
+0035 
+0036 <span class="comment">%Reading signal characteristics</span>
+0037 [Nx,Ny,Nz] = size(u); <span class="comment">%Signal dimensions</span>
+0038 B          = size(v); <span class="comment">%Signal dimensions</span>
+0039 C          = size(w); <span class="comment">%Signal dimensions</span>
+0040 
+0041 <span class="comment">%Preliminary checks</span>
+0042 <span class="keyword">if</span> ~isfield(param,<span class="string">'nimfs'</span>)
+0043     param.nimfs = 10;
+0044 <span class="keyword">end</span>
+0045 
+0046 <span class="keyword">if</span> ~isfield(param,<span class="string">'tol'</span>)
+0047     param.tol = 0.05; <span class="comment">% 0.1% of the minimum signal amplitude</span>
+0048 <span class="keyword">end</span>
+0049 
+0050 <span class="keyword">if</span> ~isfield(param,<span class="string">'type'</span>)
+0051     param.type = 6;
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="keyword">if</span> ~isfield(param,<span class="string">'plot'</span>)
+0055     param.plot = <span class="string">'off'</span>;
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="keyword">if</span>(~all(ismember(param.type,[1,2,3,4,5,6,7])))
+0059     error(<span class="string">'Please enter a valid window size type'</span>)
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="keyword">if</span>(~all([Nx,Ny,Nz]==B) ||  ~all([Nx,Ny,Nz]==C))
+0063     error(<span class="string">'Inconsistent dimensions between channels. Please check input data'</span>);
+0064 <span class="keyword">end</span>
+0065 clearvars B C
+0066 
+0067 <span class="keyword">if</span>(param.tol&lt;=0.005)
+0068    warning(<span class="string">'Low sifting tolerance may cause oversifting'</span>);
+0069    answer = questdlg(<span class="string">'Would you like to continue?'</span>, <span class="keyword">...</span>
+0070     <span class="string">'User set low sifting tolerance'</span>, <span class="keyword">...</span>
+0071     <span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0072     <span class="comment">% Handle response</span>
+0073     <span class="keyword">switch</span> answer
+0074         <span class="keyword">case</span> <span class="string">'Yes'</span>
+0075             
+0076         <span class="keyword">case</span> <span class="string">'No'</span>
+0077             <span class="keyword">return</span>;
+0078     <span class="keyword">end</span>
+0079 <span class="keyword">end</span>
+0080 
+0081 <span class="comment">%Initialisations</span>
+0082 IMF.u = zeros(Nx, Ny, Nz, param.nimfs); 
+0083 IMF.v = zeros(Nx, Ny, Nz, param.nimfs);
+0084 IMF.w = zeros(Nx, Ny, Nz, param.nimfs);
+0085 Residue.u = u; Residue.v = v; Residue.w = w;
+0086 
+0087 Windows = zeros(7,param.nimfs);
+0088 
+0089 sift_cnt = zeros(1,param.nimfs);
+0090 imf = 1;
+0091 stopflag = 1;
+0092 
+0093     <span class="keyword">while</span>(imf &lt;= param.nimfs &amp;&amp; stopflag)
+0094         <span class="comment">%Initialising intermediary IMFs</span>
+0095         H.u = Residue.u; H.v = Residue.v; H.w = Residue.w;
+0096 
+0097         sift_stop = 0; <span class="comment">%flag to control sifting loop</span>
+0098         
+0099         Combined = H.u/sqrt(3) + H.v/sqrt(3) + H.w/sqrt(3); <span class="comment">%Combining three signals with equal weights</span>
+0100         [Maxima,MaxPos,Minima,MinPos] = <a href="MinimaMaxima3D.html" class="code" title="function [Maxima,MaxPos,Minima,MinPos]=MinimaMaxima3D(Input,Robust,LookInBoundaries,numbermax,numbermin)">MinimaMaxima3D</a>(Combined,1,1,[],[]);  <span class="comment">%Obtaining extrema of combined signal</span>
+0101         
+0102         <span class="comment">%Checking whether there are too few extrema in the IMF</span>
+0103         <span class="keyword">if</span> (nnz(Maxima) &lt; 3 || nnz(Minima) &lt; 3)
+0104             warning(<span class="string">'Fewer than three extrema found in extrema map. Stopping now...'</span>);
+0105             <span class="keyword">break</span>;
+0106         <span class="keyword">end</span>
+0107         
+0108         <span class="comment">%Window size determination by delaunay triangulation</span>
+0109         Windows(:,imf) = <a href="#_sub1" class="code" title="subfunction Windows = filter_size(maxima_pos, minima_pos,type)">filter_size</a>(MaxPos,MinPos,param.type);        
+0110         w_sz = Windows(param.type,imf); <span class="comment">%extracting window size chosen by input parameter</span>
+0111         
+0112         <span class="keyword">if</span>~(w_sz)
+0113            warning(<span class="string">'EMD3D3V has stopped because the Delaunay Triangulation could not be created (collinear points)'</span>); 
+0114            stopflag = 0; <span class="comment">%#ok&lt;NASGU&gt;</span>
+0115            <span class="keyword">break</span>;
+0116         <span class="keyword">end</span>
+0117         
+0118         <span class="comment">%Begin sifting iteration</span>
+0119         <span class="keyword">while</span>~(sift_stop)            
+0120             sift_cnt(imf) = sift_cnt(imf) + 1; <span class="comment">%Incrementing sift counter</span>
+0121             <span class="comment">%Envelope Generation</span>
+0122             Env = <a href="#_sub2" class="code" title="subfunction Env = OSF(H,w_sz)">OSF</a>(H,w_sz);
+0123             
+0124             <span class="comment">%padding</span>
+0125             Env = <a href="#_sub5" class="code" title="subfunction Env = Pad_smooth(Env,w_sz)">Pad_smooth</a>(Env,w_sz);
+0126            
+0127             <span class="comment">%Calculating mean envelope</span>
+0128             Env.u.med = (Env.u.maxs + Env.u.mins)./2;
+0129             Env.v.med = (Env.v.maxs + Env.v.mins)./2;
+0130             Env.w.med = (Env.w.maxs + Env.w.mins)./2;
+0131             
+0132             <span class="comment">%Subtracting from residue</span>
+0133             H1.u = H.u - Env.u.med; H1.v = H.v - Env.v.med; H1.w = H.w - Env.w.med;         
+0134              
+0135             <span class="comment">%Stop condition checks</span>
+0136             mse_u = immse(H1.u,H.u); mse_v = immse(H1.v,H.v); mse_w = immse(H1.w,H.w);         
+0137             <span class="keyword">if</span> (mse_u&lt;param.tol &amp;&amp; mse_v&lt;param.tol &amp;&amp; mse_w&lt;param.tol &amp;&amp; sift_cnt(imf)~=1)
+0138                 sift_stop = 1;
+0139             <span class="keyword">end</span>
+0140             
+0141             H.u = H1.u; H.v = H1.v; H.w = H1.w;                
+0142         <span class="keyword">end</span>
+0143         
+0144         <span class="comment">%Storing IMFs</span>
+0145         IMF.u(:,:,:,imf) = H.u; IMF.v(:,:,:,imf) = H.v; IMF.w(:,:,:,imf) = H.w;
+0146 
+0147         <span class="comment">%Subtracting from Residual Signals</span>
+0148         Residue.u = Residue.u - IMF.u(:,:,:,imf);
+0149         Residue.v = Residue.v - IMF.v(:,:,:,imf);
+0150         Residue.w = Residue.w - IMF.w(:,:,:,imf);  
+0151         
+0152         <span class="comment">%Incrementing IMF counter</span>
+0153         imf = imf + 1;
+0154         
+0155     <span class="keyword">end</span>
+0156     
+0157     <span class="comment">%Checking for oversifting</span>
+0158     <span class="keyword">if</span>(any(sift_cnt&gt;=5*ones(size(sift_cnt))))
+0159         warning(<span class="string">'Decomposition may be oversifted. Checking if window size increases monotonically...'</span>);
+0160         
+0161         <span class="keyword">if</span>( any (diff(Windows(param.type,:)) &lt;= zeros(1,param.nimfs-1)) )
+0162         warning(<span class="string">'Filter window size does not increase monotonically'</span>)
+0163         <span class="keyword">end</span>
+0164     <span class="keyword">end</span>
+0165     
+0166     <span class="comment">%Organising results</span>
+0167     Results.IMF = IMF;
+0168     Results.windowtype = param.type;
+0169     Results.Residue = Residue;
+0170     Results.Windows = Windows;
+0171     Results.Sifts = sift_cnt;
+0172     
+0173     <span class="comment">%Error and orthogonality</span>
+0174     [Results.IO.u,Results.Error.u] = <a href="#_sub6" class="code" title="subfunction [IO,Error] = Orth_index(Signal,IMF,Residue)">Orth_index</a>(u,IMF.u,Residue.u);
+0175     [Results.IO.v,Results.Error.v] = <a href="#_sub6" class="code" title="subfunction [IO,Error] = Orth_index(Signal,IMF,Residue)">Orth_index</a>(v,IMF.v,Residue.v);
+0176     [Results.IO.w,Results.Error.w] = <a href="#_sub6" class="code" title="subfunction [IO,Error] = Orth_index(Signal,IMF,Residue)">Orth_index</a>(w,IMF.w,Residue.w);
+0177     
+0178     <span class="keyword">switch</span>(param.plot)
+0179         <span class="keyword">case</span> <span class="string">'on'</span>
+0180             <a href="#_sub7" class="code" title="subfunction Plot_results(u,v,w,Results,param)">Plot_results</a>(u,v,w,Results,param)
+0181     <span class="keyword">end</span>
+0182 <span class="keyword">end</span>
+0183 
+0184 <a name="_sub1" href="#_subfunctions" class="code">function Windows = filter_size(maxima_pos, minima_pos,type)</a>
+0185 <span class="comment">% Purpose:</span>
+0186 <span class="comment">% -To determine the window size for order statistics filtering of a signal.</span>
+0187 <span class="comment">% The determination of the window size is based on the work of Bhuiyan et</span>
+0188 <span class="comment">% al.</span>
+0189 <span class="comment">%</span>
+0190 <span class="comment">% Inputs:</span>
+0191 <span class="comment">% -Two matrices of extrema positions</span>
+0192 <span class="comment">%</span>
+0193 <span class="comment">% Outputs:</span>
+0194 <span class="comment">% -Calculated value of the window size</span>
+0195 <span class="comment">%</span>
+0196 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0197 
+0198 <span class="comment">%use delaunay triangulation to determine the nearest neighbours and hence</span>
+0199 <span class="comment">%the filter size</span>
+0200 
+0201 <span class="comment">%processing d_max</span>
+0202 max_nearest = zeros(length(maxima_pos),1);
+0203 
+0204 <span class="keyword">try</span>
+0205 TRI_max = delaunay(maxima_pos);
+0206 <span class="keyword">catch</span>
+0207     warning(<span class="string">'Maxima points are collinear. Exiting without further iterations'</span>);
+0208     Windows = [0, 0, 0, 0, 0, 0, 0];
+0209     <span class="keyword">return</span>
+0210 <span class="keyword">end</span>
+0211 
+0212 maxima_pos_x = maxima_pos(:,1);
+0213 maxima_pos_y = maxima_pos(:,2);
+0214 maxima_pos_z = maxima_pos(:,3);
+0215 
+0216 <span class="comment">%Calculating 6 edge lengths for each tetrahedron</span>
+0217 e1 = sqrt( (maxima_pos_x(TRI_max(:,2))- maxima_pos_x(TRI_max(:,1))).^2 + (maxima_pos_y(TRI_max(:,2))- maxima_pos_y(TRI_max(:,1))).^2 + (maxima_pos_z(TRI_max(:,2))- maxima_pos_z(TRI_max(:,1))).^2 );
+0218 e2 = sqrt( (maxima_pos_x(TRI_max(:,3))- maxima_pos_x(TRI_max(:,1))).^2 + (maxima_pos_y(TRI_max(:,3))- maxima_pos_y(TRI_max(:,1))).^2 + (maxima_pos_z(TRI_max(:,3))- maxima_pos_z(TRI_max(:,1))).^2 );
+0219 e3 = sqrt( (maxima_pos_x(TRI_max(:,3))- maxima_pos_x(TRI_max(:,2))).^2 + (maxima_pos_y(TRI_max(:,3))- maxima_pos_y(TRI_max(:,2))).^2 + (maxima_pos_z(TRI_max(:,3))- maxima_pos_z(TRI_max(:,2))).^2 );
+0220 e4 = sqrt( (maxima_pos_x(TRI_max(:,4))- maxima_pos_x(TRI_max(:,1))).^2 + (maxima_pos_y(TRI_max(:,4))- maxima_pos_y(TRI_max(:,1))).^2 + (maxima_pos_z(TRI_max(:,4))- maxima_pos_z(TRI_max(:,1))).^2 );
+0221 e5 = sqrt( (maxima_pos_x(TRI_max(:,4))- maxima_pos_x(TRI_max(:,2))).^2 + (maxima_pos_y(TRI_max(:,4))- maxima_pos_y(TRI_max(:,2))).^2 + (maxima_pos_z(TRI_max(:,4))- maxima_pos_z(TRI_max(:,2))).^2 );
+0222 e6 = sqrt( (maxima_pos_x(TRI_max(:,4))- maxima_pos_x(TRI_max(:,3))).^2 + (maxima_pos_y(TRI_max(:,4))- maxima_pos_y(TRI_max(:,3))).^2 + (maxima_pos_z(TRI_max(:,4))- maxima_pos_z(TRI_max(:,3))).^2 );
+0223 
+0224 <span class="comment">%Calculating nearest neighbours for each maxima point</span>
+0225 <span class="comment">%Comparing tetrahedron edges associated with each vertex</span>
+0226 em1 = min([e1, e2, e4],[],2); <span class="comment">%Comparing edges 1, 2 and 4 (vertex 1)</span>
+0227 em2 = min([e1, e3, e5],[],2); <span class="comment">%Comparing edges 1, 3 and 5 (vertex 2)</span>
+0228 em3 = min([e2, e3, e6],[],2); <span class="comment">%Comparing edges 2, 3 and 6 (vertex 3)</span>
+0229 em4 = min([e4, e5, e6],[],2); <span class="comment">%Comparing edges 4, 5 and 6 (vertex 4)</span>
+0230 
+0231 e = [em1 ,em2, em3, em4];
+0232 
+0233 <span class="comment">%Making sure that the smallest edge associated with the each vertex is stored</span>
+0234 <span class="comment">%correctly</span>
+0235 <span class="keyword">for</span> i=1:length(em1)
+0236     <span class="keyword">for</span> j=1:4
+0237         <span class="keyword">if</span> max_nearest(TRI_max(i,j)) &gt; e(i,j) || max_nearest(TRI_max(i,j)) == 0
+0238             max_nearest(TRI_max(i,j)) = e(i,j);
+0239         <span class="keyword">end</span>
+0240     <span class="keyword">end</span>
+0241 <span class="keyword">end</span>
+0242 
+0243 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0244 <span class="comment">%processing d_min</span>
+0245 min_nearest = zeros(length(minima_pos),1);
+0246 <span class="keyword">try</span>
+0247 TRI_min = delaunay(minima_pos);
+0248 <span class="keyword">catch</span>
+0249     warning(<span class="string">'Minima points are collinear. Exiting without further iterations'</span>);
+0250     Windows = [0, 0, 0, 0, 0, 0, 0];
+0251     <span class="keyword">return</span>
+0252 <span class="keyword">end</span>
+0253 minima_pos_x = minima_pos(:,1);
+0254 minima_pos_y = minima_pos(:,2);
+0255 minima_pos_z = minima_pos(:,3);
+0256 
+0257 <span class="comment">%Calculating 6 edge lengths for each tetrahedron</span>
+0258 e1 = sqrt( (minima_pos_x(TRI_min(:,2))- minima_pos_x(TRI_min(:,1))).^2 + (minima_pos_y(TRI_min(:,2))- minima_pos_y(TRI_min(:,1))).^2 + (minima_pos_z(TRI_min(:,2))- minima_pos_z(TRI_min(:,1))).^2 );
+0259 e2 = sqrt( (minima_pos_x(TRI_min(:,3))- minima_pos_x(TRI_min(:,1))).^2 + (minima_pos_y(TRI_min(:,3))- minima_pos_y(TRI_min(:,1))).^2 + (minima_pos_z(TRI_min(:,3))- minima_pos_z(TRI_min(:,1))).^2 );
+0260 e3 = sqrt( (minima_pos_x(TRI_min(:,3))- minima_pos_x(TRI_min(:,2))).^2 + (minima_pos_y(TRI_min(:,3))- minima_pos_y(TRI_min(:,2))).^2 + (minima_pos_z(TRI_min(:,3))- minima_pos_z(TRI_min(:,2))).^2 );
+0261 e4 = sqrt( (minima_pos_x(TRI_min(:,4))- minima_pos_x(TRI_min(:,1))).^2 + (minima_pos_y(TRI_min(:,4))- minima_pos_y(TRI_min(:,1))).^2 + (minima_pos_z(TRI_min(:,4))- minima_pos_z(TRI_min(:,1))).^2 );
+0262 e5 = sqrt( (minima_pos_x(TRI_min(:,4))- minima_pos_x(TRI_min(:,2))).^2 + (minima_pos_y(TRI_min(:,4))- minima_pos_y(TRI_min(:,2))).^2 + (minima_pos_z(TRI_min(:,4))- minima_pos_z(TRI_min(:,2))).^2 );
+0263 e6 = sqrt( (minima_pos_x(TRI_min(:,4))- minima_pos_x(TRI_min(:,3))).^2 + (minima_pos_y(TRI_min(:,4))- minima_pos_y(TRI_min(:,3))).^2 + (minima_pos_z(TRI_min(:,4))- minima_pos_z(TRI_min(:,3))).^2 );
+0264 
+0265 <span class="comment">%Calculating nearest neighbours for each minima point</span>
+0266 <span class="comment">%Comparing tetrahedron edges associated with each vertex</span>
+0267 emn1 = min([e1, e2, e4],[],2); <span class="comment">%Comparing edges 1, 2 and 4 (vertex 1)</span>
+0268 emn2 = min([e1, e3, e5],[],2); <span class="comment">%Comparing edges 1, 3 and 5 (vertex 2)</span>
+0269 emn3 = min([e2, e3, e6],[],2); <span class="comment">%Comparing edges 2, 3 and 6 (vertex 3)</span>
+0270 emn4 = min([e4, e5, e6],[],2); <span class="comment">%Comparing edges 4, 5 and 6 (vertex 4)</span>
+0271 
+0272 e = [emn1 ,emn2, emn3, emn4];
+0273 
+0274 <span class="comment">%Making sure that the smallest edge associated with the each vertex is stored</span>
+0275 <span class="comment">%correctly</span>
+0276 <span class="keyword">for</span> i=1:length(emn1)
+0277     <span class="keyword">for</span> j=1:4
+0278         <span class="keyword">if</span> min_nearest(TRI_min(i,j)) &gt; e(i,j) || min_nearest(TRI_min(i,j)) == 0
+0279             min_nearest(TRI_min(i,j)) = e(i,j);
+0280         <span class="keyword">end</span>
+0281     <span class="keyword">end</span>
+0282 <span class="keyword">end</span>
+0283 
+0284 <span class="comment">%Window size calculations</span>
+0285 
+0286 d1 = min( min(max_nearest) , min(min_nearest) );
+0287 d2 = max( min(max_nearest) , min(min_nearest) );
+0288 d3 = min( max(max_nearest) , max(min_nearest) );
+0289 d4 = max( max(max_nearest) , max(min_nearest) );
+0290 d5 = (d1+d2+d3+d4)/4 ;
+0291 d6 = median([min_nearest; max_nearest]);
+0292 d7 = mode([min_nearest; max_nearest]);
+0293 
+0294 Windows = [d1, d2, d3, d4, d5, d6, d7];
+0295 
+0296 <span class="comment">%making sure w_size is an odd integer</span>
+0297 Windows = 2*(floor(Windows./2))+1;
+0298          
+0299 <span class="keyword">if</span>(Windows(type)&lt;3)
+0300     warning(<span class="string">'WARNING: Calculated Window size less than 3'</span>);
+0301     warning(<span class="string">'Overriding calculated value and setting window size = 3'</span>);
+0302     Windows(type) = 3;
+0303 <span class="keyword">end</span>
+0304 <span class="keyword">end</span>
+0305 
+0306 <a name="_sub2" href="#_subfunctions" class="code">function Env = OSF(H,w_sz)</a>
+0307 <span class="comment">%Order statistics filtering to determine maximum and minmum envelopes</span>
+0308             Env.u.max = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.u, <span class="string">'max'</span>, w_sz); <span class="comment">%Max envelope u</span>
+0309             Env.u.min = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.u, <span class="string">'min'</span>, w_sz); <span class="comment">%Min envelope u</span>
+0310              
+0311             Env.v.max = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.v, <span class="string">'max'</span>, w_sz); <span class="comment">%Max envelope v</span>
+0312             Env.v.min = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.v, <span class="string">'min'</span>, w_sz); <span class="comment">%Min envelope v</span>
+0313             
+0314             Env.w.max = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.w, <span class="string">'max'</span>, w_sz); <span class="comment">%Max envelope w</span>
+0315             Env.w.min = <a href="#_sub3" class="code" title="subfunction Signal = Separable_ordfilt3(Signal, order, w_sz)">Separable_ordfilt3</a>(H.w, <span class="string">'min'</span>, w_sz); <span class="comment">%Min envelope w</span>
+0316             
+0317             <a name="_sub3" href="#_subfunctions" class="code">function Signal = Separable_ordfilt3(Signal, order, w_sz)</a>
+0318                 <span class="comment">% Purpose:</span>
+0319                 <span class="comment">% -To perform separable order statistics filtering of 3D</span>
+0320                 <span class="comment">% signals</span>
+0321                 <span class="comment">% -Boundary condition is always symmetric</span>
+0322                
+0323                 [X,Y,Z] = size(Signal);
+0324                 
+0325                 <span class="comment">%Separable Filtering</span>
+0326                 <span class="comment">%First Dimension (X)</span>
+0327                 <span class="keyword">for</span> k = 1:Z
+0328                     <span class="keyword">for</span> j = 1:Y
+0329                         Signal(:,j,k) = <a href="#_sub4" class="code" title="subfunction f_signal = Ordfilt1(signal,order,window_size)">Ordfilt1</a>(Signal(:,j,k),order,w_sz);
+0330                     <span class="keyword">end</span>
+0331                 <span class="keyword">end</span>
+0332                 
+0333                 <span class="comment">%Second Dimension (Y)</span>
+0334                 <span class="keyword">for</span> k = 1:Z
+0335                     <span class="keyword">for</span> i = 1:X
+0336                         Signal(i,:,k) = <a href="#_sub4" class="code" title="subfunction f_signal = Ordfilt1(signal,order,window_size)">Ordfilt1</a>(Signal(i,:,k),order,w_sz);
+0337                     <span class="keyword">end</span>
+0338                 <span class="keyword">end</span>
+0339                 
+0340                 <span class="comment">%Third Dimension (Z)</span>
+0341                 <span class="keyword">for</span> j = 1:Y
+0342                     <span class="keyword">for</span> i = 1:X
+0343                         Signal(i,j,:) = <a href="#_sub4" class="code" title="subfunction f_signal = Ordfilt1(signal,order,window_size)">Ordfilt1</a>(Signal(i,j,:),order,w_sz);
+0344                     <span class="keyword">end</span>
+0345                 <span class="keyword">end</span>
+0346                 
+0347                 <a name="_sub4" href="#_subfunctions" class="code">function f_signal = Ordfilt1(signal,order,window_size)</a>
+0348                     
+0349                     <span class="comment">%1-D Rank order filter function</span>
+0350                     
+0351                     <span class="comment">%Pre-processing</span>
+0352                     [a,b,c] = size(signal);           <span class="comment">%Original signal size</span>
+0353                     signal  = squeeze(signal);        <span class="comment">%Removing the singleton dimensions</span>
+0354                     L       = length(signal);         <span class="comment">%Length of the signal</span>
+0355                     signal  = reshape(signal, [L,1]); <span class="comment">%Ensure that the processed signal is always a column vector</span>
+0356                     
+0357                     r = (window_size-1)/2;
+0358                     
+0359                     <span class="comment">%Padding boundaries</span>
+0360                     x = [flip(signal(1:r)); signal ;flip(signal(end-(r-1):end))];
+0361                     
+0362                     [M,~] = size(x);
+0363                     y = zeros(size(x));
+0364                                             
+0365                     <span class="keyword">switch</span> order
+0366                         <span class="keyword">case</span> <span class="string">'max'</span>
+0367                             <span class="keyword">for</span> m = 1+r:M-r
+0368                                 <span class="comment">% Extract a window of size (2r+1) around (m)</span>
+0369                                 temp = x((m-r):(m+r));
+0370                                 w = sort(temp);
+0371                                 y(m) = w(end); <span class="comment">% Select the greatest element</span>
+0372                             <span class="keyword">end</span>
+0373                         <span class="keyword">case</span> <span class="string">'min'</span>
+0374                             <span class="keyword">for</span> m = 1+r:M-r
+0375                                 <span class="comment">% Extract a window of size (2r+1) around (m)</span>
+0376                                 temp = x((m-r):(m+r));
+0377                                 w = sort(temp);
+0378                                 y(m) = w(1); <span class="comment">% Select the smallest element</span>
+0379                             <span class="keyword">end</span>
+0380                         <span class="keyword">otherwise</span>
+0381                             error(<span class="string">'No such filering operation defined'</span>)
+0382                     <span class="keyword">end</span>
+0383                     
+0384                     f_signal = y(1+r:end-r);
+0385                     
+0386                     f_signal = reshape(f_signal,[a,b,c]); <span class="comment">%Restoring Signal size</span>
+0387                 <span class="keyword">end</span>          
+0388             <span class="keyword">end</span>
+0389 <span class="keyword">end</span>
+0390 
+0391 <a name="_sub5" href="#_subfunctions" class="code">function Env = Pad_smooth(Env,w_sz)</a>
+0392 h = floor(w_sz/2);
+0393 
+0394 <span class="comment">%Padding</span>
+0395 <span class="comment">%u</span>
+0396 temp = padarray(Env.u.max,[h h],<span class="string">'replicate'</span>);
+0397 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0398 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0399 Env.u.maxp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0400 
+0401 temp = padarray(Env.u.min,[h h],<span class="string">'replicate'</span>);
+0402 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0403 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0404 Env.u.minp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0405 <span class="comment">%v</span>
+0406 temp = padarray(Env.v.max,[h h],<span class="string">'replicate'</span>);
+0407 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0408 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0409 Env.v.maxp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0410 
+0411 temp = padarray(Env.v.min,[h h],<span class="string">'replicate'</span>);
+0412 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0413 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0414 Env.v.minp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0415 <span class="comment">%w</span>
+0416 temp = padarray(Env.w.max,[h h],<span class="string">'replicate'</span>);
+0417 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0418 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0419 Env.w.maxp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0420 
+0421 temp = padarray(Env.w.min,[h h],<span class="string">'replicate'</span>);
+0422 temp1 = permute(temp,[3 2 1]); <span class="comment">%interchanging dimensions</span>
+0423 temp = padarray(temp1,[h 0],<span class="string">'replicate'</span>);
+0424 Env.w.minp = permute(temp,[3 2 1]); <span class="comment">%restoring dimensions</span>
+0425 
+0426 <span class="comment">%Smoothing</span>
+0427 <span class="comment">%u</span>
+0428 temp1 = movmean(Env.u.maxp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0429 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0430 Env.u.maxs = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0431 temp1 = movmean(Env.u.minp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0432 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0433 Env.u.mins = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0434 <span class="comment">%v</span>
+0435 temp1 = movmean(Env.v.maxp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0436 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0437 Env.v.maxs = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0438 temp1 = movmean(Env.v.minp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0439 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0440 Env.v.mins = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0441 <span class="comment">%w</span>
+0442 temp1 = movmean(Env.w.maxp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0443 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0444 Env.w.maxs = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0445 temp1 = movmean(Env.w.minp,w_sz,3,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0446 temp2 = movmean(temp1,w_sz,2,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0447 Env.w.mins = movmean(temp2,w_sz,1,<span class="string">'endpoints'</span>,<span class="string">'discard'</span>);
+0448 
+0449 <span class="keyword">end</span>
+0450 
+0451 <a name="_sub6" href="#_subfunctions" class="code">function [IO,Error] = Orth_index(Signal,IMF,Residue)</a>
+0452 <span class="comment">% Purpose:</span>
+0453 <span class="comment">% To calculate the index of orthogonality of a decomposition and its mean</span>
+0454 <span class="comment">% squared error</span>
+0455 
+0456 n_imf = size(IMF,4);
+0457 numerator = zeros(size(Signal));
+0458 I = sum(IMF,4) + Residue;
+0459 
+0460 Error.map = (Signal-I)./Signal;
+0461 Error.global = immse(I,Signal);
+0462 
+0463 <span class="keyword">for</span> j = 1:n_imf
+0464     <span class="keyword">for</span> k = 1:n_imf
+0465         <span class="keyword">if</span>(j~=k)
+0466            numerator = numerator + IMF(:,:,:,j).*IMF(:,:,:,k);
+0467         <span class="keyword">end</span>
+0468     <span class="keyword">end</span>
+0469 <span class="keyword">end</span>
+0470 
+0471 IO.map = numerator/sum(sum(sum(Signal.^2))); <span class="comment">%wrong</span>
+0472 IO.global = sum(sum(sum(IO.map)));
+0473 <span class="keyword">end</span>
+0474 
+0475 <a name="_sub7" href="#_subfunctions" class="code">function Plot_results(u,v,w,Results,param)</a>
+0476 <span class="comment">% default plot attributes</span>
+0477 set(groot,<span class="string">'defaultaxesfontname'</span>,<span class="string">'times'</span>);
+0478 set(groot,<span class="string">'defaultaxesfontsize'</span>,12);
+0479 set(groot,<span class="string">'defaulttextInterpreter'</span>,<span class="string">'latex'</span>);
+0480 set(groot,<span class="string">'defaultLineLineWidth'</span>,2);
+0481 
+0482 Colour = <a href="redblue.html" class="code" title="function c = redblue(m)">redblue</a>();
+0483 nslice  = param.nslice;
+0484 
+0485 figure(1)   
+0486         subplot(1,3,1)
+0487         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(u,Colour,nslice,0,<span class="string">'Signal'</span>,<span class="string">'u'</span>);
+0488         subplot(1,3,2)
+0489         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(v,Colour,nslice,0,<span class="string">'Signal'</span>,<span class="string">'v'</span>);
+0490         subplot(1,3,3)
+0491         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(w,Colour,nslice,0,<span class="string">'Signal'</span>,<span class="string">'w'</span>);
+0492 
+0493 
+0494     <span class="keyword">for</span> i=1:param.nimfs
+0495      figure(i+1)   
+0496         subplot(1,3,1)
+0497         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.IMF.u(:,:,:,i),Colour,nslice,i,<span class="string">'IMF'</span>,<span class="string">'u'</span>);
+0498         subplot(1,3,2)
+0499         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.IMF.v(:,:,:,i),Colour,nslice,i,<span class="string">'IMF'</span>,<span class="string">'v'</span>);
+0500         subplot(1,3,3)
+0501         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.IMF.w(:,:,:,i),Colour,nslice,i,<span class="string">'IMF'</span>,<span class="string">'w'</span>);
+0502     <span class="keyword">end</span>
+0503     
+0504     figure(i+2)
+0505     subplot(1,3,1)
+0506         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.Residue.u,Colour,nslice,0,<span class="string">'Residue'</span>,<span class="string">'u'</span>);
+0507         subplot(1,3,2)
+0508         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.Residue.v,Colour,nslice,0,<span class="string">'Residue'</span>,<span class="string">'v'</span>);
+0509         subplot(1,3,3)
+0510         <a href="TIMF_plot.html" class="code" title="function TIMF_plot(signal,Colour,nslice,imf,name1,name2)">TIMF_plot</a>(Results.Residue.w,Colour,nslice,0,<span class="string">'Residue'</span>,<span class="string">'w'</span>);
+0511 <span class="keyword">end</span>
+0512 
+0513 <a name="_sub8" href="#_subfunctions" class="code">function TIMF_plot(signal,Colour,nslice,imf,name1,name2)    </a>
+0514 
+0515     [Nx, Ny, Nz] = size(signal);
+0516 
+0517     xslice = linspace(1,Nx,nslice);
+0518     yslice = linspace(1,Ny,nslice);
+0519     zslice = linspace(1,Nz,nslice);
+0520     volume = slice(signal,xslice,yslice,zslice);
+0521     axis equal;
+0522     xlabel(<span class="string">'x'</span>);
+0523     ylabel(<span class="string">'y'</span>);
+0524     zlabel(<span class="string">'z'</span>);
+0525     set(gca,<span class="string">'TickLabelInterpreter'</span>,<span class="string">'latex'</span>)
+0526     <span class="keyword">switch</span>(name1)
+0527         <span class="keyword">case</span> <span class="string">'IMF'</span>
+0528             title(sprintf(<span class="string">'%s %d %s'</span>,name1,imf,name2));
+0529         <span class="keyword">case</span> <span class="string">'Signal'</span>
+0530             title(sprintf(<span class="string">'%s %s'</span>,name1,name2));
+0531         <span class="keyword">case</span> <span class="string">'Residue'</span>
+0532             title(sprintf(<span class="string">'%s %s'</span>,name1,name2));
+0533     <span class="keyword">end</span>
+0534     colorbar;
+0535     set(volume,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="keyword">...</span>
+0536         <span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="keyword">...</span>
+0537         <span class="string">'FaceAlpha'</span>,<span class="string">'interp'</span>)
+0538     alpha(<span class="string">'color'</span>)
+0539     view(30,30);
+0540     alphamap(<span class="string">'rampup'</span>)
+0541     alphamap(<span class="string">'decrease'</span>,.1)
+0542     colormap(Colour);
+0543     caxis([-3 3]);
+0544     hcb = colorbar;
+0545     colorTitleHandle = get(hcb,<span class="string">'Title'</span>);
+0546     titleString = sprintf(<span class="string">'%s'</span>,name2);
+0547     set(colorTitleHandle ,<span class="string">'String'</span>,titleString,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>,<span class="string">'FontSize'</span>,14);
+0548     set(hcb,<span class="string">'TickLabelInterpreter'</span>,<span class="string">'latex'</span>);
+0549     
+0550 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 18-Apr-2019 12:22:00 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

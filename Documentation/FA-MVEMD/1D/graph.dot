@@ -1,0 +1,19 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  EMD1D2V -> extrema;
+  EMD1D2V -> filter_size1D;
+  EMD1D3V -> extrema;
+  EMD1D3V -> filter_size1D;
+  EMD1DNV -> extrema;
+  EMD1DNV -> filter_size1D;
+  driver_1d_example -> EMD1D3V;
+  driver_1dnv_example -> EMD1DNV;
+
+  EMD1D2V [URL="EMD1D2V.html"];
+  EMD1D3V [URL="EMD1D3V.html"];
+  EMD1DNV [URL="EMD1DNV.html"];
+  driver_1d_example [URL="driver_1d_example.html"];
+  driver_1dnv_example [URL="driver_1dnv_example.html"];
+  extrema [URL="extrema.html"];
+  filter_size1D [URL="filter_size1D.html"];
+}
