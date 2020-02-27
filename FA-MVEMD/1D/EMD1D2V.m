@@ -175,103 +175,13 @@ imf = 1;
     end
 end
 
-function Windows = filter_size1D(imax, imin, type)
-%
-% Purpose:
-% -To determine the window size for order statistics filtering of a signal.
-% The determination of the window size is based on the work of Bhuiyan et
-% al.
-%
-% Inputs: 
-% -Two 1D extrema maps
-%
-% Outputs:
-% -Calculated value of the window size
-%
-% Written by Mruthun Thirumalaisamy
-% Graduate Student
-% Department of Aerospace Engineering
-% University of Illinois at Urbana-Champaign
-% March 30 2018
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-edge_len_max = diff(sort(imax));
-edge_len_min = diff(sort(imin));
-    
-    
-        %Window size calculations
-        
-        d1 = min( min(edge_len_max) , min(edge_len_min) );
-        d2 = max( min(edge_len_max) , min(edge_len_min) );
-        d3 = min( max(edge_len_max) , max(edge_len_min) );
-        d4 = max( max(edge_len_max) , max(edge_len_min) );
-        d5 = (d1+d2+d3+d4)/4 ;
-        d6 = median([edge_len_max; edge_len_min]);
-        d7 = mode([edge_len_max; edge_len_min]);
-        
-        Windows = [d1, d2, d3, d4, d5, d6, d7];
-
-%making sure w_size is an odd integer
-Windows = 2*(floor(Windows./2))+1;
-         
-if(Windows(type)<3)
-    warning('WARNING: Calculated Window size less than 3');
-    warning('Overriding calculated value and setting window size = 3');
-    Windows(type) = 3;
-end
-
-end
-
 function Env = OSF(H,w_sz)
 %Order statistics filtering to determine maximum and minmum envelopes
             Env.u.max = Ordfilt1(H.u, 'max', w_sz); %Max envelope u
             Env.u.min = Ordfilt1(H.u, 'min', w_sz); %Min envelope u
              
             Env.v.max = Ordfilt1(H.v, 'max', w_sz); %Max envelope v
-            Env.v.min = Ordfilt1(H.v, 'min', w_sz); %Min envelope v
-                
-        function f_signal = Ordfilt1(signal,order,window_size)
-
-            %1-D Rank order filter function
-
-            %Pre-processing
-            [a,b,c] = size(signal);           %Original signal size
-            signal  = squeeze(signal);        %Removing the singleton dimensions
-            L       = length(signal);         %Length of the signal
-            signal  = reshape(signal, [L,1]); %Ensure that the processed signal is always a column vector
-
-            r = (window_size-1)/2;
-
-            %Padding boundaries
-            x = [flip(signal(1:r)); signal ;flip(signal(end-(r-1):end))];
-
-            [M,~] = size(x);
-            y = zeros(size(x));
-
-            switch order
-                case 'max'
-                    for m = 1+r:M-r
-                        % Extract a window of size (2r+1) around (m)
-                        temp = x((m-r):(m+r));
-                        w = sort(temp);
-                        y(m) = w(end); % Select the greatest element
-                    end
-                case 'min'
-                    for m = 1+r:M-r
-                        % Extract a window of size (2r+1) around (m)
-                        temp = x((m-r):(m+r));
-                        w = sort(temp);
-                        y(m) = w(1); % Select the smallest element
-                    end
-                otherwise
-                    error('No such filering operation defined')
-            end
-
-            f_signal = y(1+r:end-r);
-
-            f_signal = reshape(f_signal,[a,b,c]); %Restoring Signal size
-        end
-      
+            Env.v.min = Ordfilt1(H.v, 'min', w_sz); %Min envelope v      
 end
 
 function Env = Pad_smooth(Env,w_sz)
@@ -350,23 +260,3 @@ figure(1)
     subplot(2,4,8)
     IMF_plot(Results.Residue.v,t,0,'Residue','Channel 2');
 end
-
-function IMF_plot(signal,t,imf,name1,name2)    
-
-    plot(t,signal,'-k');
-    axis ([0 6*pi -5 5]);
-    xlabel('t');
-    set(gca,'TickLabelInterpreter','tex')
-    switch(name1)
-        case 'IMF'
-            title(sprintf('%s %d %s',name1,imf,name2));
-        case 'Channel'
-            title(sprintf('%s %s',name1,name2));
-        case 'Residue'
-            title(sprintf('%s %s',name1,name2));
-    end
-    
-    
-end
-
-
