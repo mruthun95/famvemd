@@ -1,14 +1,8 @@
-function TIMF_plot(signal,Colour,nslice,imf,name1,name2)
 
-% default plot attributes
-set(groot,'defaultaxesfontname','times');
-set(groot,'defaultaxesfontsize',12);
-set(groot,'defaulttextInterpreter','latex');
-set(groot,'defaultLineLineWidth',2);
+function TIMF_plot(signal,Colour,nslice,imf,name1,name2)    
 
-[Nx, Ny, Nz] = size(signal);
+    [Nx, Ny, Nz] = size(signal);
 
-figure
     xslice = linspace(1,Nx,nslice);
     yslice = linspace(1,Ny,nslice);
     zslice = linspace(1,Nz,nslice);
@@ -17,6 +11,7 @@ figure
     xlabel('x');
     ylabel('y');
     zlabel('z');
+    set(gca,'TickLabelInterpreter','latex')
     switch(name1)
         case 'IMF'
             title(sprintf('%s %d %s',name1,imf,name2));
@@ -26,7 +21,6 @@ figure
             title(sprintf('%s %s',name1,name2));
     end
     colorbar;
-%     caxis([c(1) c(2)]);
     set(volume,'EdgeColor','none',...
         'FaceColor','interp',...
         'FaceAlpha','interp')
@@ -35,3 +29,11 @@ figure
     alphamap('rampup')
     alphamap('decrease',.1)
     colormap(Colour);
+%     caxis([-3 3]); %TODO: Why commented out in all but EMD3D3V?
+    hcb = colorbar;
+    colorTitleHandle = get(hcb,'Title');
+    titleString = '$\frac{u}{U_{\infty}}$';
+    set(colorTitleHandle ,'String',titleString,'Interpreter','latex','FontSize',14);
+    set(hcb,'TickLabelInterpreter','latex');
+    
+end

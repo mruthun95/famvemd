@@ -171,8 +171,8 @@ stopflag = 1;
     Results.Sifts = sift_cnt;
     
     %Error and orthogonality
-    [Results.IO.u,Results.Error.u] = Orth_index(u,IMF.u,Residue.u);
-    [Results.IO.v,Results.Error.v] = Orth_index(v,IMF.v,Residue.v);
+    [Results.IO.u,Results.Error.u] = Orth_index2D(u,IMF.u,Residue.u);
+    [Results.IO.v,Results.Error.v] = Orth_index2D(v,IMF.v,Residue.v);
     
     switch(param.plot)
         case 'on'

@@ -1,4 +1,4 @@
-function [IO,Error] = Orth_index(Signal,IMF,Residue)
+function [IO,Error] = Orth_index2D(Signal,IMF,Residue)
 % Purpose: 
 % To calculate the index of orthogonality of a decomposition and its mean
 % squared error
